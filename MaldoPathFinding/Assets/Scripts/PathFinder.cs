@@ -31,6 +31,7 @@ public class PathFinder : MonoBehaviour {
 		}
 
 		//BuscarRuta ();
+		BuscarRutaEstrella();
 	}
 
 
@@ -193,7 +194,7 @@ public class PathFinder : MonoBehaviour {
 		}
 	}
 
-	Stack<int> ObtenerRuta(){
+	public Stack<Vector2> ObtenerRuta(){
 		Node nodoLlegada = null;
 		Node nodoInicio = null;
 
@@ -204,11 +205,12 @@ public class PathFinder : MonoBehaviour {
 				nodoInicio = AllNodes [i];
 		}
 
-		Stack<int> IDPath = new Stack<int> ();
+		Stack<Vector2> IDPath = new Stack<Vector2> ();
 		if (nodoLlegada != null && nodoInicio != null) {
 			Node tmp = nodoLlegada;
 			do {
-				IDPath.Push (tmp.id);
+				Debug.Log(tmp);
+				IDPath.Push (tmp.transform.position);
 				tmp.parteDelCamino = true;
 				tmp = tmp.parent;
 			} while(tmp != nodoInicio);

@@ -9,23 +9,26 @@ public class PrintNode : MonoBehaviour {
 	SpriteRenderer rendi;
 	public TextMesh idText;
 
-	Color Wall;
-	Color Walkable;
-	Color Path;
-	Color Starts;
-	Color Finish;
+	public Color Wall;
+	public Color Walkable;
+	public Color Path;
+	public Color Starts;
+	public Color Finish;
 
 	void Start(){
 		node = GetComponent<Node> ();
 		rendi = GetComponent<SpriteRenderer> ();
 
+		if(idText != null)
 		idText.text = node.peso.ToString();
-
+		
+		/*
 		Wall = Color.red;
 		Walkable = Color.grey;
 		Path = Color.green;
 		Starts = Color.blue;
 		Finish = Color.black;
+		*/
 	}
 
 
@@ -48,6 +51,7 @@ public class PrintNode : MonoBehaviour {
 			rendi.color = Finish;
 		}
 
+		if(idText != null)
 		idText.text = node.peso.ToString();
 	}
 }
