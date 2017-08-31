@@ -41,26 +41,26 @@ public class CheckeadorDeCliksByPepi : MonoBehaviour {
 
 
 
-		if (Input.GetAxis("Mouse ScrollWheel") > 0f ) // forward
-		{
-			Camera cam = Camera.main;
-			RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
+		//if (Input.GetAxis("Mouse ScrollWheel") > 0f ) // forward
+		//{
+		//	Camera cam = Camera.main;
+		//	RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
 
-			if(rayHit.collider != null)
-			if (rayHit.collider.gameObject.tag == "Node") {
-				rayHit.collider.gameObject.GetComponent<Node> ().peso++;
-			}
-		}
-		else if (Input.GetAxis("Mouse ScrollWheel") < 0f ) // backwards
-		{
-			Camera cam = Camera.main;
-			RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
+		//	if(rayHit.collider != null)
+		//	if (rayHit.collider.gameObject.tag == "Node") {
+		//		rayHit.collider.gameObject.GetComponent<Node> ().peso++;
+		//	}
+		//}
+		//else if (Input.GetAxis("Mouse ScrollWheel") < 0f ) // backwards
+		//{
+		//	Camera cam = Camera.main;
+		//	RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(Input.mousePosition));
 
-			if(rayHit.collider != null)
-			if (rayHit.collider.gameObject.tag == "Node") {
-				rayHit.collider.gameObject.GetComponent<Node> ().peso--;
-			}
-		}
+		//	if(rayHit.collider != null)
+		//	if (rayHit.collider.gameObject.tag == "Node") {
+		//		rayHit.collider.gameObject.GetComponent<Node> ().peso--;
+		//	}
+		//}
 
 
 

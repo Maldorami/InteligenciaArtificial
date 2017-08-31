@@ -13,6 +13,9 @@ public class PathFinder : MonoBehaviour {
 
     public int NodosVisitados = 0;
 
+    public GameObject Carretilla;
+    public GameObject Mina;
+    public GameObject Minero;
 
 	void Start(){
 		AllNodes = new List<Node> ();
@@ -170,9 +173,16 @@ public class PathFinder : MonoBehaviour {
 			AllNodes [i].salida = false;
 
 			if(AllNodes [i].id == salida)
-				AllNodes [i].salida = true;
+            {
+                Carretilla.transform.position = AllNodes[i].transform.position;
+                Minero.transform.position = new Vector3(Carretilla.transform.position.x, Carretilla.transform.position.y, -1);
+                AllNodes [i].salida = true;
+            }
 		}
-	}
+
+        BuscarRutaEstrella();
+
+    }
 
 	public void cambiarPuntoDeLlegada(int llegada){
 		idLlegada = llegada;
@@ -181,9 +191,13 @@ public class PathFinder : MonoBehaviour {
 			AllNodes [i].llegada = false;
 
 			if(AllNodes [i].id == llegada)
-				AllNodes [i].llegada = true;
+            {
+                Mina.transform.position = AllNodes[i].transform.position;
+                AllNodes [i].llegada = true;
+            }
 		}
-	}
+        BuscarRutaEstrella();
+    }
 
 
 	void AbrirNodoInicial(){
@@ -195,6 +209,7 @@ public class PathFinder : MonoBehaviour {
 	}
 
 	public Stack<Vector2> ObtenerRuta(){
+
 		Node nodoLlegada = null;
 		Node nodoInicio = null;
 
@@ -209,12 +224,16 @@ public class PathFinder : MonoBehaviour {
 		if (nodoLlegada != null && nodoInicio != null) {
 			Node tmp = nodoLlegada;
 			do {
-				Debug.Log(tmp);
+				//Debug.Log(tmp);
 				IDPath.Push (tmp.transform.position);
 				tmp.parteDelCamino = true;
 				tmp = tmp.parent;
 			} while(tmp != nodoInicio);
+
+            IDPath.Push(tmp.transform.position);
+            tmp.parteDelCamino = true;
 		}
+            
 
         NodosVisitados = NodosCerrados.Count;
 		return IDPath;

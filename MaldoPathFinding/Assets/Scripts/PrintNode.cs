@@ -34,17 +34,20 @@ public class PrintNode : MonoBehaviour {
 
 	void Update ()
 	{		
-		if (node.isWall) {
-			rendi.color = Wall;
-		} else {
-			rendi.color = Walkable;
-		}
-
 		if (node.parteDelCamino) {
 			rendi.color = Path;
 		}
 
-		if (node.salida) {
+        if (node.isWall)
+        {
+            rendi.color = Wall;
+        }
+        else
+        {
+            rendi.color = Walkable;
+        }
+
+        if (node.salida) {
 			rendi.color = Starts;
 		}
 		if (node.llegada) {
