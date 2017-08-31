@@ -2,46 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum State
-{
-    Quieto = 0,
-    CaminandoALaPiedra,
-    Minando,
-    CaminandoALaCarretilla,
-    Depositando
-};
 
-public enum Event
-{
-    NuevoPedidoDePiedra = 0,
-    Llegue,
-    MeLlene,
-    Termine,
-    MeVacie
-}
 
 public class FSM : MonoBehaviour
 {
-    State _currentState;
+    int _currentState;
     int[,] _FSMMatrix;
 
-    public void Init()
+	public void Init(int states, int events)
     {
-        _FSMMatrix = new int[System.Enum.GetNames(typeof(State)).Length, System.Enum.GetNames(typeof(Event)).Length];
+		_FSMMatrix = new int[states, events];
+
+		for (int i = 0; i < states; i++)
+			for (int j = 0; j < events; j++) {
+				_FSMMatrix [i, j] = -1;
+			}
+
         _currentState = 0;
     }
 
-    public void SetRelation(State origen, Event evento, State destino)
+    public void SetRelation(int origen, int evento, int destino)
     {
-        _FSMMatrix[(int)origen, (int)evento] = (int)destino;
+        _FSMMatrix[origen, evento] = destino;
     }
 
-    public void SetEvent(Event evento)
+    public void SetEvent(int evento)
     {
-        _currentState = (State)_FSMMatrix[(int)_currentState, (int)evento];
+		if(_FSMMatrix[_currentState, evento] != -1)
+        _currentState = _FSMMatrix[_currentState, evento];
     }
 
-    public State GetState()
+    public int GetState()
     {
         return _currentState;
     }

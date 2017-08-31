@@ -2,6 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum State
+{
+	Quieto = 0,
+	CaminandoALaPiedra = 1,
+	Minando = 2,
+	CaminandoALaCarretilla = 3,
+	Depositando = 4
+};
+
+public enum Event
+{
+	NuevoPedidoDePiedra = 0,
+	Llegue = 1,
+	MeLlene = 2,
+	Termine = 3,
+	MeVacie = 4
+}
+
 public class MinerMovement : MonoBehaviour
 {
 
@@ -24,37 +42,38 @@ public class MinerMovement : MonoBehaviour
         _path = new Stack<Vector2>();
 
         StateMachine = gameObject.GetComponent<FSM>();
-        StateMachine.Init();
-        StateMachine.SetRelation(State.CaminandoALaPiedra, Event.Llegue, State.Minando);
-        StateMachine.SetRelation(State.Minando, Event.MeLlene, State.CaminandoALaCarretilla);
-        StateMachine.SetRelation(State.Minando, Event.Termine, State.CaminandoALaCarretilla);
-        StateMachine.SetRelation(State.Depositando, Event.MeVacie, State.CaminandoALaPiedra);
-        StateMachine.SetRelation(State.Quieto, Event.NuevoPedidoDePiedra, State.CaminandoALaPiedra);
-        StateMachine.SetRelation(State.CaminandoALaCarretilla, Event.Llegue, State.Depositando);
-        StateMachine.SetRelation(State.Depositando, Event.Termine, State.Quieto);
+		StateMachine.Init(System.Enum.GetNames(typeof(State)).Length, System.Enum.GetNames(typeof(Event)).Length);
+
+		StateMachine.SetRelation((int)State.CaminandoALaPiedra, (int)Event.Llegue, (int)State.Minando);
+		StateMachine.SetRelation((int)State.Minando, (int)Event.MeLlene, (int)State.CaminandoALaCarretilla);
+		StateMachine.SetRelation((int)State.Minando, (int)Event.Termine, (int)State.CaminandoALaCarretilla);
+		StateMachine.SetRelation((int)State.Depositando, (int)Event.MeVacie, (int)State.CaminandoALaPiedra);
+		StateMachine.SetRelation((int)State.Quieto, (int)Event.NuevoPedidoDePiedra, (int)State.CaminandoALaPiedra);
+		StateMachine.SetRelation((int)State.CaminandoALaCarretilla, (int)Event.Llegue, (int)State.Depositando);
+		StateMachine.SetRelation((int)State.Depositando, (int)Event.Termine, (int)State.Quieto);
     }
 
     void Update()
     {
-        switch (StateMachine.GetState())
+		switch (StateMachine.GetState())
         {
-            case State.Quieto:
+		case (int)State.Quieto:
                 //Nothing To Do
                 break;
 
-            case State.CaminandoALaPiedra:
+		case (int)State.CaminandoALaPiedra:
                 Caminando();
                 break;
 
-            case State.Minando:
+		case (int)State.Minando:
                 Minando();
                 break;
 
-            case State.CaminandoALaCarretilla:
+		case (int)State.CaminandoALaCarretilla:
                 Caminando();
                 break;
 
-            case State.Depositando:
+		case (int)State.Depositando:
                 Depositando();
                 break;
 
@@ -92,7 +111,7 @@ public class MinerMovement : MonoBehaviour
             if (_path.Count == 0)
             {
                 SetReturnPath();
-                StateMachine.SetEvent(Event.Llegue);
+				StateMachine.SetEvent((int)Event.Llegue);
                 GetPath();
             }
         }
@@ -108,12 +127,12 @@ public class MinerMovement : MonoBehaviour
 
             if (cantPiedrasEnMochila + piedrasEnElDeposito >= objetivoPiedrasAObtener)
             {
-                StateMachine.SetEvent(Event.Termine);
+				StateMachine.SetEvent((int)Event.Termine);
             }else
             if (cantPiedrasEnMochila >= capacidadMochila)
             {
                 cantPiedrasEnMochila = capacidadMochila;
-                StateMachine.SetEvent(Event.MeLlene);
+					StateMachine.SetEvent((int)Event.MeLlene);
             }
 
            
@@ -131,17 +150,18 @@ public class MinerMovement : MonoBehaviour
             cantPiedrasEnMochila--;
             piedrasEnElDeposito++;
 
+			if (piedrasEnElDeposito >= objetivoPiedrasAObtener)
+			{
+				piedrasEnElDeposito = objetivoPiedrasAObtener;
+				StateMachine.SetEvent((int)Event.Termine); 
+			}else
             if (cantPiedrasEnMochila <= 0)
             {
                 cantPiedrasEnMochila = 0;
-                StateMachine.SetEvent(Event.MeVacie);
+				StateMachine.SetEvent((int)Event.MeVacie);
             }
 
-            if (piedrasEnElDeposito >= objetivoPiedrasAObtener)
-            {
-                piedrasEnElDeposito = objetivoPiedrasAObtener;
-                StateMachine.SetEvent(Event.Termine); 
-            }
+            
 
             timer = 0;
         }
@@ -150,7 +170,7 @@ public class MinerMovement : MonoBehaviour
 
     public void NuevoPedidoDePiedras(int pedido)
     {
-        StateMachine.SetEvent(Event.NuevoPedidoDePiedra);
+		StateMachine.SetEvent((int)Event.NuevoPedidoDePiedra);
 
         objetivoPiedrasAObtener = pedido;
         piedrasEnElDeposito = 0;
