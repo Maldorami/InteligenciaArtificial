@@ -4,7 +4,7 @@ public abstract class BT_ConditionalNode<T> : BT_Node<T> where T : class {
 
     protected BT_ConditionalNode(T blackboard) : base(blackboard){}
 
-    override protected State OnUpdate()
+    override public State OnUpdate()
     {
         if (Condition())
         {

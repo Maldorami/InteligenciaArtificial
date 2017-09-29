@@ -21,7 +21,7 @@
     protected abstract void Reset();
     protected abstract void Awake();
     protected abstract void Sleep();
-    protected abstract State OnUpdate();
+    public abstract State OnUpdate();
 
     public State Update()
     {

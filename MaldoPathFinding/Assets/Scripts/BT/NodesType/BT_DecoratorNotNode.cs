@@ -3,7 +3,7 @@ public class BT_DecoratorNotNode<T> : BT_NodeWithChild<T> where T : class{
 
     protected BT_DecoratorNotNode(T blackboard) : base(blackboard){}
 
-    override protected State OnUpdate()
+    override public State OnUpdate()
     {
         if(childs[0] != null)
         {

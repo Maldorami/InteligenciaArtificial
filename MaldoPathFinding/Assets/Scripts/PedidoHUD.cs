@@ -20,7 +20,7 @@ public class PedidoHUD : MonoBehaviour {
         cantTotalPedidoText.text = "Objetivo de piedras\n" + miner.objetivoPiedrasAObtener.ToString();
         capacidadMochila.text = "Capacidad de mochila\n" + miner.capacidadMochila.ToString();
 
-		DeliveryButton.interactable = (miner.StateMachine.GetState() == (int)State.Quieto);
+		DeliveryButton.interactable = !miner.pedidoPendiente;
     }
 
     public void Delivery()

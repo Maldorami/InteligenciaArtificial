@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-abstract class BT_LogicAndNode<T> : BT_NodeWithChild<T> where T : class {
+public class BT_LogicAndNode<T> : BT_NodeWithChild<T> where T : class {
 
     protected BT_LogicAndNode(T blackboard) : base(blackboard){ }
 
-    override protected State OnUpdate()
+    override public State OnUpdate()
     {
         if (childs.Count > 0)
         {

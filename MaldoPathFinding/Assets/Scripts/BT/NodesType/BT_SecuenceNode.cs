@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
-
-abstract class BT_SecuenceOrNode<T> : BT_NodeWithChild<T> where T : class{
+public class BT_SecuenceNode<T> : BT_NodeWithChild<T> where T : class{
 
     int curIndex;
 
-    protected BT_SecuenceOrNode(T blackboard) : base(blackboard){
+    public BT_SecuenceNode(T blackboard) : base(blackboard){
         curIndex = 0;
     }
 
 
-    override protected State OnUpdate()
+    override public State OnUpdate()
     {
         if (childs.Count > 0)
         {
@@ -19,13 +18,13 @@ abstract class BT_SecuenceOrNode<T> : BT_NodeWithChild<T> where T : class{
                 {
                     case State.True:
                         {
-                            curIndex = 0;
-                            return BT_Node<T>.State.True;
+                            curIndex++;
+                            break;
                         }
                     case BT_Node<T>.State.False:
                         {
-                            curIndex++;
-                            break;
+                            curIndex = 0;
+                            return BT_Node<T>.State.False;
                         }
                     case BT_Node<T>.State.Processing:
                         {
@@ -34,10 +33,10 @@ abstract class BT_SecuenceOrNode<T> : BT_NodeWithChild<T> where T : class{
                         }
                     default:
                         {
-                            Debug.LogError("<color=red>BT_SecuenceOrNode fail!: method 'Update' cant return State.None</color>");
+                            Debug.LogError("<color=red>BT_SecuenceNode fail!: method 'Update' cant return State.None</color>");
                             return BT_Node<T>.State.False;
                         }
-                }
+                }               
             }
 
             curIndex = 0;
@@ -54,4 +53,3 @@ abstract class BT_SecuenceOrNode<T> : BT_NodeWithChild<T> where T : class{
     protected override void Reset() { }
     protected override void Sleep() { }
 }
-
