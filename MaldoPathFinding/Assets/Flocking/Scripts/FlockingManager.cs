@@ -8,6 +8,15 @@ public class FlockingManager : MonoBehaviour
     public float rangeNeighbors = 1;
     List<Boid> _boids;
 
+    public GameObject target;
+
+    public float SepModif = 1;
+    public float CohModif = 1;
+    public float AlignmModif = 1;
+    public float DistanceModif = 1;
+
+    public float minDistanceToNeighboor = 5f;
+
     void Start()
     {
         GameObject[] tmp = GameObject.FindGameObjectsWithTag("Boid");
@@ -16,32 +25,38 @@ public class FlockingManager : MonoBehaviour
         {
             _boids.Add(tmp[i].GetComponent<Boid>());
         }
+
+        for (int x = 0; x < _boids.Count; x++)
+        {
+            _boids[x].target = target;
+        }
+
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
-        {
-            Ray rayHit = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            for (int i = 0; i < _boids.Count; i++)
-            {
-                _boids[i].GoToPosition(rayHit.origin);
-            }
-        }
-
         ClearAndAddNeighborsToBoids();
+
     }
 
     void ClearAndAddNeighborsToBoids()
     {
-        for (int x = 0; x < _boids.Count; x++) _boids[x].ClearNeighbors();
+        for (int x = 0; x < _boids.Count; x++) {
+            _boids[x].ClearNeighbors();
+        }
 
-        for(int i = 0; i < _boids.Count; i++)
+        for (int i = 0; i < _boids.Count; i++)
         {
-            for(int j = i + 1; j < _boids.Count; j++)
+            _boids[i].SepModif = SepModif;
+            _boids[i].CohModif = CohModif;
+            _boids[i].AlignmModif = AlignmModif;
+            _boids[i].DistanceModif = DistanceModif;
+
+            _boids[i].minDistanceToNeighboor = minDistanceToNeighboor;
+
+            for (int j = i + 1; j < _boids.Count; j++)
             {
-                if (Vector2.Distance(_boids[i].gameObject.transform.position,_boids[j].gameObject.transform.position) < rangeNeighbors)
+                if (Vector2.Distance(_boids[i].gameObject.transform.position, _boids[j].gameObject.transform.position) < rangeNeighbors)
                 {
                     _boids[i].AddNeighbor(_boids[j]);
                     _boids[j].AddNeighbor(_boids[i]);

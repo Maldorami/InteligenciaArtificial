@@ -7,11 +7,17 @@ public class Boid : MonoBehaviour
     public float speed = 5;
     public float steeringSpeed = 3;
     public List<Boid> neighbors;
+
     public float pesoSep = 1;
     public float pesoCoh = 1;
 
-    bool move = false;
-    Vector3 target = new Vector2();    
+    public float minDistanceToNeighboor = 5f;
+    public float SepModif = 1;
+    public float CohModif = 1;
+    public float AlignmModif = 1;
+    public float DistanceModif = 1;
+
+    public GameObject target;    
 
     private void Start()
     {
@@ -20,52 +26,41 @@ public class Boid : MonoBehaviour
 
     void Update()
     {
-        if (move)
-        {
             CalculateMovement();
-        }
-    }
-
-    public void GoToPosition(Vector3 destPos)
-    {
-        move = true;
-        target = destPos;
-        Debug.Log("<color=yellow>" + destPos + "</color>");
-    }
-
-  
+    }  
 
     public void CalculateMovement()
     {
-        // DIR = (Sep * pesoSep + Coh * pesoCoh + Alin) / 3.0f
-
         Vector3 cohesion = ComputeCohesion();
-        Vector3 separation = ComputeSeparation();
-        Quaternion alignment = ComputeAlignment();
-        
-        //transform.position = cohesion - separation;
-        transform.rotation = Quaternion.Lerp(transform.rotation, alignment, steeringSpeed * Time.deltaTime);
 
-        transform.position += transform.right * speed * Time.deltaTime;
-        if (Vector2.Distance(transform.position, target) <= 0.5) move = false;
+        pesoSep = Mathf.Clamp01(Vector3.Distance(transform.position, cohesion) / minDistanceToNeighboor);
+        pesoCoh = 1 - pesoSep;
+        cohesion.Normalize();
+
+        Vector3 separation = -cohesion;
+        Vector3 alignment = ComputeAlignment();
+
+        cohesion = (cohesion - transform.position).normalized;
+        separation = -cohesion;
+
+        transform.position += -transform.forward * speed * Time.deltaTime;
+        Vector3 result = (cohesion * pesoCoh * CohModif + separation * pesoSep * SepModif + alignment * AlignmModif + (transform.position - target.transform.position).normalized * DistanceModif);
+        result.Normalize();
+
+        transform.forward = Vector3.Lerp(transform.forward, result, steeringSpeed * Time.deltaTime);
     }
 
 
-    Quaternion ComputeAlignment()
+    Vector3 ComputeAlignment()
     {
-        Vector3 tmp = target;
+        Vector3 tmp = transform.forward;
 
         for (int i = 0; i < neighbors.Count; i++)
-            tmp += neighbors[i].transform.position;
+            tmp += neighbors[i].transform.right;
 
-        tmp /= neighbors.Count;
+        tmp /= neighbors.Count + 1;
 
-        Vector3 diff = (target + tmp) - transform.position;
-        diff.Normalize();
-        float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
-        Quaternion rot = Quaternion.AngleAxis(rot_z, Vector3.forward);
-
-        return rot;
+        return tmp.normalized;
     }
 
     Vector3 ComputeCohesion()
@@ -75,7 +70,7 @@ public class Boid : MonoBehaviour
         for (int i = 0; i < neighbors.Count; i++)
             center += neighbors[i].transform.position;
         center /= neighbors.Count + 1;
-
+        
         return center;
     }
     Vector3 ComputeSeparation()
