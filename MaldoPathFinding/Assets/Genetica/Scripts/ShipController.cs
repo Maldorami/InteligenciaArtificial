@@ -10,6 +10,9 @@ public class ShipController : MonoBehaviour {
     [SerializeField]
     Rigidbody _rg;
 
+    [SerializeField]
+    Agent agent;
+
     private void Start()
     {
         _rg = GetComponent<Rigidbody>();
@@ -55,5 +58,13 @@ public class ShipController : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+    }
+
+    public void StartTest(Agent Agent)
+    {
+        this.agent = Agent;
+
+
+
     }
 }

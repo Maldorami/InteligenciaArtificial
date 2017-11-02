@@ -5,77 +5,96 @@ using UnityEngine;
 public class GeneticAlg : MonoBehaviour {
 
     [SerializeField]
-    int elitePercentage = 10;
+    int eliteSurvivors = 5;
+    
 
-    [SerializeField]
-    Agent[] roulette;
-
-    public void Crossover()
+    public List<Agent> Crossover()
     {
+        List<Agent> epochPopulation = new List<Agent>();
+        Agent a, b;
+        for(int i = 0; i < (GeneticManager.instance.population.Count - eliteSurvivors) / 2; i++)
+        {
+            a = Roulette();
+            b = Roulette();
 
+            List<Gen> a1 = new List<Gen>();
+            List<Gen> a2 = new List<Gen>();
+            List<Gen> b1 = new List<Gen>();
+            List<Gen> b2 = new List<Gen>();
+
+            for (int j = 0; j < a.chromosome._chromosome.Count / 2; j++) a1.Add(a.chromosome._chromosome[j]);
+            for (int j = a.chromosome._chromosome.Count / 2; j < a.chromosome._chromosome.Count; j++) a2.Add(a.chromosome._chromosome[j]);
+            for (int j = 0; j < b.chromosome._chromosome.Count / 2; j++) b1.Add(b.chromosome._chromosome[j]);
+            for (int j = b.chromosome._chromosome.Count / 2; j < b.chromosome._chromosome.Count; j++) b2.Add(b.chromosome._chromosome[j]);
+
+            for (int j = 0; j < a.chromosome._chromosome.Count; j++) a.chromosome._chromosome[j].IntentarMutar();
+            for (int j = 0; j < b.chromosome._chromosome.Count; j++) b.chromosome._chromosome[j].IntentarMutar();
+
+            a.chromosome.CambiarCromosoma(a1, b2);
+            b.chromosome.CambiarCromosoma(b1, a2);
+
+            epochPopulation.Add(a);
+            epochPopulation.Add(b);
+        }
+
+        return epochPopulation;
     }
 
     public Agent Roulette()
     {
         Agent ag = new Agent();
         ag.InicializarAgent();
+        int total = 0;
+        for (int i = 0; i < GeneticManager.instance.population.Count; i++)
+            total += GeneticManager.instance.population[i].chromosome._puntaje;
 
+        int selected = Random.Range(0, total);
+        int tmp = 0;
+        for (int i = 0; i < GeneticManager.instance.population.Count; i++)
+        {
+            tmp += GeneticManager.instance.population[i].chromosome._puntaje;
 
-
-
+            if (tmp > selected)
+            {
+                ag = GeneticManager.instance.population[i];
+                break;
+            }
+        }
 
         return ag;
-    }
+    }        
 
-    void SetRoulette()
+    public List<Agent> Elitism()
     {
-        int tmp = 0;
-        for (int i = 0; i < GeneticManager.instance.agents.Length; i++)
+        List<Agent> elite = new List<Agent>();        
+
+        for(int i= 0; i < eliteSurvivors; i++)
         {
-            tmp += GeneticManager.instance.agents[i].chromosome._puntaje;
-        }
-
-        roulette = new Agent[tmp];
-
-
-        for (int j = 0; j < GeneticManager.instance.agents.Length; j++)
-        {
-            
-        }
-
-    }
-
-    public void Mutation()
-    {
-
-    }
-
-    public Agent[] Elitism()
-    {
-        Agent[] elite = new Agent[(elitePercentage * GeneticManager.instance.AgentPoblation) / 100];
-        for (int x = 0; x < elite.Length; x++)
-        {
-            elite[x] = GeneticManager.instance.agents[x];
-        }
-
-        for (int i = 0; i < GeneticManager.instance.agents.Length; i++)
-        {
-            for(int j = 0; j < elite.Length; j++)
-            {
-                if(GeneticManager.instance.agents[i].chromosome._puntaje > elite[j].chromosome._puntaje)
-                {
-                    elite[j] = GeneticManager.instance.agents[i];
-                    break;
-                }
-            }
+            elite.Add(GeneticManager.instance.population[i]);
         }
 
         return elite;
     }
 
-    public void Epoch()
+    public List<Agent> Epoch()
     {
-        
+        List<Agent> newPopulation = new List<Agent>();
+
+        GeneticManager.instance.population.Sort(delegate (Agent a, Agent b) {
+            return (a.chromosome._puntaje).CompareTo(b.chromosome._puntaje);
+        });
+
+        List<Agent> tmp = Elitism();
+        for (int i = 0; i < tmp.Count; i++)
+            newPopulation.Add(tmp[i]);
+
+        tmp.Clear();
+        tmp = Crossover();
+        for (int i = 0; i < tmp.Count; i++)
+            newPopulation.Add(tmp[i]);
+
+
+        return newPopulation;
     }
 
 }

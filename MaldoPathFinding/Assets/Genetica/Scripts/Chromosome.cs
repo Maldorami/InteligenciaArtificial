@@ -2,22 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chromosome : MonoBehaviour {
+public class Chromosome : MonoBehaviour
+{
 
     [SerializeField]
-    int ChromosomeLenght = 6;
+    int ChromosomeLenght = 8;
 
-    public Gen[] _chromosome;
+    public List<Gen> _chromosome;
     public int _puntaje = 1;
 
     public void CrearCromosoma()
     {
-        _chromosome = new Gen[ChromosomeLenght];
+        _chromosome = new List<Gen>();
 
-        for (int i = 0; i < _chromosome.Length; i++)
-            _chromosome[i].CrearGen();
-
+        for (int i = 0; i < ChromosomeLenght; i++)
+        {
+            Gen gen = new Gen();
+            gen.CrearGen();
+            _chromosome.Add(gen);
+        }
         _puntaje = 1;
     }
 
+    public void CambiarCromosoma(List<Gen> x, List<Gen> y)
+    {
+        _chromosome.Clear();
+
+        for (int i = 0; i < x.Count; i++)
+        {
+            _chromosome.Add(x[i]);
+        }
+        for (int i = 0; i < y.Count; i++)
+        {
+            _chromosome.Add(y[i]);
+        }
+    }
 }
