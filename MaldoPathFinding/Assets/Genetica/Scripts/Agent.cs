@@ -8,6 +8,7 @@ public class Agent : MonoBehaviour {
 
     public void InicializarAgent()
     {
+        chromosome = new Chromosome();
         chromosome.CrearCromosoma();
     }
 

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class ShipController : MonoBehaviour {
     [SerializeField]
@@ -13,17 +14,58 @@ public class ShipController : MonoBehaviour {
     [SerializeField]
     Agent agent;
 
-    private void Start()
+    Queue<Gen> actionsAndTime;
+    float timer = 0;
+    int puntaje = 0;
+
+    private void OnEnable()
     {
         _rg = GetComponent<Rigidbody>();
+        actionsAndTime = new Queue<Gen>();
+        actionsAndTime.Clear();
     }
 
     private void Update()
     {
-        fire.SetActive(false);        
-        if (Input.GetKey(KeyCode.W)) ApplyThrotle();
-        if (Input.GetKey(KeyCode.A)) SteerLeft();
-        if (Input.GetKey(KeyCode.D)) SteerRight();
+        fire.SetActive(false);
+        
+        if(actionsAndTime.Count > 0)
+        {
+            timer += Time.deltaTime;
+            puntaje += (int)Time.deltaTime;
+
+            if (timer < actionsAndTime.Peek()._tiempo)
+                switch (actionsAndTime.Peek()._action)
+                {
+                    case Action.Propulsor:
+                        ApplyThrotle();
+                        break;
+                    case Action.GirarDerecha:
+                        SteerLeft();
+                        break;
+                    case Action.GirarIzquierda:
+                        SteerRight();
+                        break;
+                }
+            else
+            {
+                actionsAndTime.Dequeue();
+                timer = 0;
+            }
+        }
+    }
+
+    public void SetAgent(Agent ag)
+    {
+        agent = ag;
+        puntaje = 0;
+        actionsAndTime = new Queue<Gen>();
+        actionsAndTime.Clear();
+
+        for(int i = 0; i < agent.chromosome._chromosome.Count; i++)
+        {
+            actionsAndTime.Enqueue(agent.chromosome._chromosome[i]);
+        }
     }
 
     public void ApplyThrotle()
@@ -42,29 +84,11 @@ public class ShipController : MonoBehaviour {
     }
     
 
-    private void OnCollisionEnter(Collision collision)
+    public void CalcularPuntaje()
     {
-        if (collision.gameObject.tag == "Start")
-        {
-            //Debug.Log("<color=green>LLEGO!</color>");
-            return;
-        }
+        GameObject tmp = GameObject.FindGameObjectWithTag("Finish");
+        puntaje += 1000 / ((int)Vector3.Distance(transform.position, tmp.transform.position) + 1);
 
-        if (collision.gameObject.tag == "Finish")
-        {
-            Debug.Log("<color=green>LLEGO!</color>");
-        }
-            else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    public void StartTest(Agent Agent)
-    {
-        this.agent = Agent;
-
-
-
+        agent.chromosome._puntaje = puntaje;
     }
 }

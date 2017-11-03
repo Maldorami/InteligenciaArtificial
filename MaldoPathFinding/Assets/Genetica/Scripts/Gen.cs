@@ -28,18 +28,19 @@ public class Gen : MonoBehaviour {
         }
 
         _tiempo = Random.Range(0.2f, 1.0f);
+        probabilidadDeMutar = 1;
 	}
 	
     public void IntentarMutar()
     {
         int aux = Random.Range(0, 100);
 
-        if (aux < probabilidadDeMutar)
+        if (aux <= probabilidadDeMutar)
         {
             if (Random.value == 1)
-                _tiempo += 0.1f;
+                _tiempo += 0.01f;
             else
-                _tiempo -= 0.1f;
+                _tiempo -= 0.01f;
         }
 
         if (_tiempo <= 0f) _tiempo = 0.1f;
