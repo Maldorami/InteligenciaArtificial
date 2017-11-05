@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GeneticAlg : MonoBehaviour {
+public class GeneticAlg : MonoBehaviour{
 
     [SerializeField]
     int eliteSurvivors = 5;
     
 
-    public List<Agent> Crossover()
+    public List<Chromosome> Crossover()
     {
-        List<Agent> epochPopulation = new List<Agent>();
-        Agent a, b;
-        for(int i = 0; i < (GeneticManager.instance.population.Count - eliteSurvivors) / 2; i++)
+        List<Chromosome> epochPopulation = new List<Chromosome>();
+        Chromosome a, b;
+        for(int i = 0; i < (GeneticManager.instance.Ships.Count - eliteSurvivors) / 2; i++)
         {
             a = Roulette();
             b = Roulette();
@@ -22,16 +22,16 @@ public class GeneticAlg : MonoBehaviour {
             List<Gen> b1 = new List<Gen>();
             List<Gen> b2 = new List<Gen>();
 
-            for (int j = 0; j < a.chromosome._chromosome.Count / 2; j++) a1.Add(a.chromosome._chromosome[j]);
-            for (int j = a.chromosome._chromosome.Count / 2; j < a.chromosome._chromosome.Count; j++) a2.Add(a.chromosome._chromosome[j]);
-            for (int j = 0; j < b.chromosome._chromosome.Count / 2; j++) b1.Add(b.chromosome._chromosome[j]);
-            for (int j = b.chromosome._chromosome.Count / 2; j < b.chromosome._chromosome.Count; j++) b2.Add(b.chromosome._chromosome[j]);
+            for (int j = 0; j < a._chromosome.Count / 2; j++) a1.Add(a._chromosome[j]);
+            for (int j = a._chromosome.Count / 2; j < a._chromosome.Count; j++) a2.Add(a._chromosome[j]);
+            for (int j = 0; j < b._chromosome.Count / 2; j++) b1.Add(b._chromosome[j]);
+            for (int j = b._chromosome.Count / 2; j < b._chromosome.Count; j++) b2.Add(b._chromosome[j]);
 
-            for (int j = 0; j < a.chromosome._chromosome.Count; j++) a.chromosome._chromosome[j].IntentarMutar();
-            for (int j = 0; j < b.chromosome._chromosome.Count; j++) b.chromosome._chromosome[j].IntentarMutar();
+            for (int j = 0; j < a._chromosome.Count; j++) a._chromosome[j].IntentarMutar();
+            for (int j = 0; j < b._chromosome.Count; j++) b._chromosome[j].IntentarMutar();
 
-            a.chromosome.CambiarCromosoma(a1, b2);
-            b.chromosome.CambiarCromosoma(b1, a2);
+            a.CambiarCromosoma(a1, b2);
+            b.CambiarCromosoma(b1, a2);
 
             epochPopulation.Add(a);
             epochPopulation.Add(b);
@@ -40,23 +40,23 @@ public class GeneticAlg : MonoBehaviour {
         return epochPopulation;
     }
 
-    public Agent Roulette()
+    public Chromosome Roulette()
     {
-        Agent ag = new Agent();
-        ag.InicializarAgent();
-        int total = 0;
-        for (int i = 0; i < GeneticManager.instance.population.Count; i++)
-            total += GeneticManager.instance.population[i].chromosome._puntaje;
+        Chromosome ag = GeneticManager.instance.Ships[0].chromosome;
 
-        int selected = Random.Range(0, total);
-        int tmp = 0;
-        for (int i = 0; i < GeneticManager.instance.population.Count; i++)
+        float total = 0;
+        for (int i = 0; i < GeneticManager.instance.Ships.Count; i++)
+            total += GeneticManager.instance.Ships[i].chromosome._puntaje;
+
+        float selected = Random.Range(0f, total);
+        float tmp = 0;
+        for (int i = 0; i < GeneticManager.instance.Ships.Count; i++)
         {
-            tmp += GeneticManager.instance.population[i].chromosome._puntaje;
+            tmp += GeneticManager.instance.Ships[i].chromosome._puntaje;
 
             if (tmp > selected)
             {
-                ag = GeneticManager.instance.population[i];
+                ag = GeneticManager.instance.Ships[i].chromosome;
                 break;
             }
         }
@@ -64,27 +64,28 @@ public class GeneticAlg : MonoBehaviour {
         return ag;
     }        
 
-    public List<Agent> Elitism()
+    public List<Chromosome> Elitism()
     {
-        List<Agent> elite = new List<Agent>();        
+        List<Chromosome> elite = new List<Chromosome>();
 
         for(int i= 0; i < eliteSurvivors; i++)
         {
-            elite.Add(GeneticManager.instance.population[i]);
+            elite.Add(GeneticManager.instance.Ships[i].chromosome);
         }
 
         return elite;
     }
 
-    public List<Agent> Epoch()
+    public List <Chromosome> Epoch()
     {
-        List<Agent> newPopulation = new List<Agent>();
+        List<Chromosome> newPopulation = new List<Chromosome>();
 
-        GeneticManager.instance.population.Sort(delegate (Agent a, Agent b) {
-            return (a.chromosome._puntaje).CompareTo(b.chromosome._puntaje);
+        GeneticManager.instance.Ships.Sort(delegate (ShipController a, ShipController b)
+        {
+            return (b.chromosome._puntaje).CompareTo(a.chromosome._puntaje);
         });
 
-        List<Agent> tmp = Elitism();
+        List<Chromosome> tmp = Elitism();
         for (int i = 0; i < tmp.Count; i++)
             newPopulation.Add(tmp[i]);
 
@@ -93,6 +94,12 @@ public class GeneticAlg : MonoBehaviour {
         for (int i = 0; i < tmp.Count; i++)
             newPopulation.Add(tmp[i]);
 
+        //newPopulation.Clear();
+        //for (int i = 0; i < GeneticManager.instance.Ships.Count; i++)
+        //    newPopulation.Add(GeneticManager.instance.Ships[i].chromosome);
+
+        for (int i = 0; i < newPopulation.Count; i++)
+            newPopulation[i]._puntaje = 0;
 
         return newPopulation;
     }

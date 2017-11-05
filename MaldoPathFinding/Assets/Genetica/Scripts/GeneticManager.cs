@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GeneticManager : MonoBehaviour
@@ -7,24 +6,21 @@ public class GeneticManager : MonoBehaviour
 
     public static GeneticManager instance;
     public int AgentPoblation = 50;
-    public List<Agent> population;
+    
+    public GeneticAlg geneticAlg;
 
-    [SerializeField]
-    GeneticAlg geneticAlg;
-
-    public GameObject Ship;
+    public List<ShipController> Ships;
     bool onTest = false;
 
     public float timerToEpoch = 10;
     float timer;
 
-    private void Awake()
+    private void Start()
     {
         if (instance == null)
             instance = this;
         else
             Destroy(gameObject);
-
 
         FirstPopulation();
         BeginTest();
@@ -32,12 +28,9 @@ public class GeneticManager : MonoBehaviour
 
     void FirstPopulation()
     {
-        population = new List<Agent>();
-        for (int i = 0; i < AgentPoblation; i++)
+        for (int i = 0; i < Ships.Count; i++)
         {
-            Agent ag = new Agent();
-            ag.InicializarAgent();
-            population.Add(ag);
+            Ships[i].InicializarAgent();
         }
     }
 
@@ -61,35 +54,33 @@ public class GeneticManager : MonoBehaviour
 
     void CalcularPuntajes()
     {
-        GameObject[] tmp = GameObject.FindGameObjectsWithTag("Ship");
-        for (int i = 0; i < tmp.Length; i++)
+        for (int i = 0; i < Ships.Count; i++)
         {
-            tmp[i].GetComponent<ShipController>().CalcularPuntaje();
+            Ships[i].CalcularPuntaje();
         }
     }
 
     void KillCurrentPoblation()
     {
-        GameObject[] tmp = GameObject.FindGameObjectsWithTag("Ship");
-        for (int i = 0; i < tmp.Length; i++)
+        for (int i = 0; i < Ships.Count; i++)
         {
-            Destroy(tmp[i].gameObject);
+            Ships[i].gameObject.SetActive(false);
         }
     }
 
     void BeginTest()
     {        
-        for (int i = 0; i < population.Count; i++)
+        for (int i = 0; i < Ships.Count; i++)
         {
-            ShipController ship = Instantiate(Ship).GetComponent<ShipController>();
-            ship.SetAgent(population[i]);
+            Ships[i].gameObject.SetActive(true);
         }
         onTest = true;
     }
 
     public void EpochPoblation()
     {
-        //population.Clear();
-        population = geneticAlg.Epoch();
+        List<Chromosome> newChromosomes = geneticAlg.Epoch();
+        for (int i = 0; i < Ships.Count; i++)
+            Ships[i].setChromosome(newChromosomes[i]);
     }
 }

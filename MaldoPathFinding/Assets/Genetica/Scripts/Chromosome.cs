@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chromosome : MonoBehaviour
+public class Chromosome
 {
 
     [SerializeField]
     int ChromosomeLenght = 8;
 
     public List<Gen> _chromosome;
-    public int _puntaje = 1;
+    public float _puntaje = 1;
 
     public void CrearCromosoma()
     {

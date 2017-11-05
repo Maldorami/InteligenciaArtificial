@@ -10,31 +10,51 @@ public class ShipController : MonoBehaviour {
     float steerSpeed;
     [SerializeField]
     Rigidbody _rg;
+   
+    public Stack<Gen> actionsAndTime;
+
+    float timer = 0;
 
     [SerializeField]
-    Agent agent;
+    Transform resetPoint;
 
-    Queue<Gen> actionsAndTime;
-    float timer = 0;
-    int puntaje = 0;
+    public Transform target;
+
+    public Chromosome chromosome;
+
+    public void InicializarAgent()
+    {
+        chromosome = new Chromosome();
+        chromosome.CrearCromosoma();
+    }
+
+    private void OnDisable()
+    {
+        _rg.isKinematic = true;
+        _rg.isKinematic = false;
+
+        _rg.velocity = Vector3.zero;
+    }
 
     private void OnEnable()
     {
         _rg = GetComponent<Rigidbody>();
-        actionsAndTime = new Queue<Gen>();
-        actionsAndTime.Clear();
+        actionsAndTime = new Stack<Gen>();
+        actionsAndTime.Clear();       
+        transform .position= resetPoint.position;
+        transform.rotation = resetPoint.rotation;
+        SetActions();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         fire.SetActive(false);
         
         if(actionsAndTime.Count > 0)
         {
-            timer += Time.deltaTime;
-            puntaje += (int)Time.deltaTime;
+            timer += Time.fixedDeltaTime;
 
-            if (timer < actionsAndTime.Peek()._tiempo)
+            if (timer <= actionsAndTime.Peek()._tiempo)
                 switch (actionsAndTime.Peek()._action)
                 {
                     case Action.Propulsor:
@@ -49,28 +69,32 @@ public class ShipController : MonoBehaviour {
                 }
             else
             {
-                actionsAndTime.Dequeue();
+                actionsAndTime.Pop();
                 timer = 0;
             }
         }
     }
 
-    public void SetAgent(Agent ag)
+    public void setChromosome(Chromosome chr)
     {
-        agent = ag;
-        puntaje = 0;
-        actionsAndTime = new Queue<Gen>();
+        chromosome = chr;
+    }
+
+    public void SetActions()
+    {
+        actionsAndTime = new Stack<Gen>();
         actionsAndTime.Clear();
 
-        for(int i = 0; i < agent.chromosome._chromosome.Count; i++)
+        for(int i = 0; i < chromosome._chromosome.Count; i++)
         {
-            actionsAndTime.Enqueue(agent.chromosome._chromosome[i]);
+            actionsAndTime.Push(chromosome._chromosome[i]);
         }
+                
     }
 
     public void ApplyThrotle()
     {
-        _rg.AddForce(transform.up * throtle);
+        _rg.AddForce(transform.up * throtle, ForceMode.Acceleration);
         fire.SetActive(true);
     }
 
@@ -85,10 +109,13 @@ public class ShipController : MonoBehaviour {
     
 
     public void CalcularPuntaje()
-    {
-        GameObject tmp = GameObject.FindGameObjectWithTag("Finish");
-        puntaje += 1000 / ((int)Vector3.Distance(transform.position, tmp.transform.position) + 1);
+    {    
+        chromosome._puntaje = 1000 / (Vector3.Distance(transform.position, target.position) + 0.1f);
+        Debug.Log(gameObject.name + "  " + chromosome._puntaje);
+    }
 
-        agent.chromosome._puntaje = puntaje;
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Finish") chromosome._puntaje += 100;
     }
 }

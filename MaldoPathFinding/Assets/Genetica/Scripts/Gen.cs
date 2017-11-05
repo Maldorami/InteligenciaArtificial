@@ -7,7 +7,7 @@ public enum Action
     GirarIzquierda
 }
 
-public class Gen : MonoBehaviour {
+public class Gen{
     
     public Action _action;
     public float _tiempo;
