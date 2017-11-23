@@ -7,7 +7,7 @@ public enum Action
     GirarIzquierda
 }
 
-public class Gen{
+public struct Gen{
     
     public Action _action;
     public float _tiempo;
@@ -37,10 +37,12 @@ public class Gen{
 
         if (aux <= probabilidadDeMutar)
         {
+            Debug.Log("<color=red>MUTÓ!</color>");
+
             if (Random.value == 1)
-                _tiempo += 0.01f;
+                _tiempo += 0.1f;
             else
-                _tiempo -= 0.01f;
+                _tiempo -= 0.1f;
         }
 
         if (_tiempo <= 0f) _tiempo = 0.1f;

@@ -15,6 +15,12 @@ public class GeneticManager : MonoBehaviour
     public float timerToEpoch = 10;
     float timer;
 
+    public float distModif = 1;
+    public float rotModif = 1;
+    public float airTimeModif = 1;
+    public float impactToFinishModif = 1;
+
+
     private void Start()
     {
         if (instance == null)
@@ -72,6 +78,10 @@ public class GeneticManager : MonoBehaviour
     {        
         for (int i = 0; i < Ships.Count; i++)
         {
+            Ships[i].gameObject.GetComponent<ShipController>().airTimeModif = airTimeModif;
+            Ships[i].gameObject.GetComponent<ShipController>().distModif = distModif;
+            Ships[i].gameObject.GetComponent<ShipController>().rotModif = rotModif;
+            Ships[i].gameObject.GetComponent<ShipController>().impactToFinishModif = impactToFinishModif;
             Ships[i].gameObject.SetActive(true);
         }
         onTest = true;

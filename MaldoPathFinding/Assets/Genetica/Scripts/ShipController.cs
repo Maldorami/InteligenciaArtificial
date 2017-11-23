@@ -14,12 +14,22 @@ public class ShipController : MonoBehaviour {
     public Stack<Gen> actionsAndTime;
 
     float timer = 0;
+        
+    public float distModif = 1;
+    public float rotModif = 1;
+    public float airTimeModif = 1;
+    public float impactToFinishModif = 1; 
+    bool isOnCollision = true;
+    public float impactToFinish = 0;
+    
+
+     [SerializeField]
+    float airTime = 0;
 
     [SerializeField]
     Transform resetPoint;
 
     public Transform target;
-
     public Chromosome chromosome;
 
     public void InicializarAgent()
@@ -43,14 +53,19 @@ public class ShipController : MonoBehaviour {
         actionsAndTime.Clear();       
         transform .position= resetPoint.position;
         transform.rotation = resetPoint.rotation;
+        isOnCollision = true;
+        airTime = 0;
+        impactToFinish = 0;
         SetActions();
     }
 
     private void FixedUpdate()
     {
         fire.SetActive(false);
-        
-        if(actionsAndTime.Count > 0)
+
+        if(!isOnCollision) airTime += Time.deltaTime;
+
+        if (actionsAndTime.Count > 0)
         {
             timer += Time.fixedDeltaTime;
 
@@ -109,13 +124,32 @@ public class ShipController : MonoBehaviour {
     
 
     public void CalcularPuntaje()
-    {    
-        chromosome._puntaje = 1000 / (Vector3.Distance(transform.position, target.position) + 0.1f);
+    {
+        float distFit = 0;
+        float rotFit = transform.rotation.z;
+        distFit = Vector3.Distance(transform.position, target.transform.position);
+
+        if (impactToFinish < 1) impactToFinish = 1;
+
+        chromosome._puntaje = distModif / distFit + impactToFinishModif / impactToFinish + airTime / airTimeModif; 
         Debug.Log(gameObject.name + "  " + chromosome._puntaje);
     }
+    
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.tag == "Finish") chromosome._puntaje += 100;
+        isOnCollision = true;
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        isOnCollision = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    { 
+        if(collision.gameObject.tag == "Finish")
+        if(impactToFinish == 0)
+        impactToFinish = collision.relativeVelocity.magnitude;
     }
 }
