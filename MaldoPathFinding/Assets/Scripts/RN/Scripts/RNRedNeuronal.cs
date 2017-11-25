@@ -24,16 +24,20 @@ public class RNRedNeuronal {
 
     public void CrearRedNeuronal()
     {
-        if(hiddenLayers > 0)
+        int prevInputs = inputs;
+
+        layers.Add(new RNLayer(prevInputs, inputs));
+
+        if (hiddenLayers > 0)
         {
-            layers.Add(new RNLayer(inputs, neuronasPorLayer));
             for (int i = 0; i < hiddenLayers; i++)
             {
-                layers.Add(new RNLayer(neuronasPorLayer, neuronasPorLayer));
+                layers.Add(new RNLayer(prevInputs, neuronasPorLayer));
+                prevInputs = neuronasPorLayer;
             }
         }
 
-        layers.Add(new RNLayer(inputs, outputs));
+        layers.Add(new RNLayer(prevInputs, outputs));
     }
 
 
@@ -50,7 +54,7 @@ public class RNRedNeuronal {
             return outputs;
         }
         //For each layer...
-        for (int i = 0; i < hiddenLayers + 1; ++i)
+        for (int i = 0; i < hiddenLayers + 2; ++i)
         {
             if (i > 0)
             {
@@ -87,20 +91,20 @@ public class RNRedNeuronal {
 
     float Sigmoide(float act)
     {
-        return (1 / (1 + Mathf.Exp(-act / pendiente)));
+        return (1.0f / (1.0f + Mathf.Exp(-act / pendiente)));
     }
 
     public RNCromosoma ObtenerPesos()
     {
         RNCromosoma _pesos = new RNCromosoma();
 
-        foreach(RNLayer layer in layers)
+        for (int i = 0; i < layers.Count; i++)
         {
-            foreach(RNNeurona neurona in layer.neuronas)
+            for (int j = 0; j < layers[i].neuronasCount; j++)
             {
-                foreach(float peso in neurona.pesos)
+                for (int k = 0; k < layers[i].neuronas[j].pesos.Count; k++)
                 {
-                    _pesos.cromosoma.Add(new RNGen(peso));
+                    _pesos.cromosoma.Add(new RNGen(layers[i].neuronas[j].pesos[k]));
                 }
             }
         }

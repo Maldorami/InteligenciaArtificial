@@ -10,9 +10,9 @@ public struct RNGen
     }
     public void IntentarMutar()
     {
-        if(Random.Range(0, 100) < 1)
+        if(Random.Range(0, 100) < 10)
         {
-            peso += Random.Range(-0.1f, 0.1f);
+            peso += Random.Range(-0.01f, 0.01f);
         }
     }
 };

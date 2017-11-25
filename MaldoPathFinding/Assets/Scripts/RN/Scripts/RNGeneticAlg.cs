@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RNGeneticAlg : MonoBehaviour {
-    
+public class RNGeneticAlg : MonoBehaviour
+{
+
     public int eliteSurvivors = 5;
 
     public List<RNCromosoma> Crossover()
@@ -16,24 +17,29 @@ public class RNGeneticAlg : MonoBehaviour {
             a = Roulette();
             b = Roulette();
 
+            RNCromosoma child1 = new RNCromosoma();
+            RNCromosoma child2 = new RNCromosoma();
+
             List<RNGen> a1 = new List<RNGen>();
             List<RNGen> a2 = new List<RNGen>();
             List<RNGen> b1 = new List<RNGen>();
             List<RNGen> b2 = new List<RNGen>();
 
-            for (int j = 0; j < a.cromosoma.Count / 2; j++) a1.Add(a.cromosoma[j]);
-            for (int j = a.cromosoma.Count / 2; j < a.cromosoma.Count; j++) a2.Add(a.cromosoma[j]);
-            for (int j = 0; j < b.cromosoma.Count / 2; j++) b1.Add(b.cromosoma[j]);
-            for (int j = b.cromosoma.Count / 2; j < b.cromosoma.Count; j++) b2.Add(b.cromosoma[j]);
+            int pivot = Random.Range(0, a.cromosoma.Count);
+
+            for (int j = 0; j < pivot; j++) a1.Add(a.cromosoma[j]);
+            for (int j = pivot; j < a.cromosoma.Count; j++) a2.Add(a.cromosoma[j]);
+            for (int j = 0; j < pivot; j++) b1.Add(b.cromosoma[j]);
+            for (int j = pivot; j < b.cromosoma.Count; j++) b2.Add(b.cromosoma[j]);
 
             for (int j = 0; j < a.cromosoma.Count; j++) a.cromosoma[j].IntentarMutar();
             for (int j = 0; j < b.cromosoma.Count; j++) b.cromosoma[j].IntentarMutar();
 
-            a.CambiarCromosoma(a1, b2);
-            b.CambiarCromosoma(b1, a2);
+            child1.CambiarCromosoma(a1, b2);
+            child2.CambiarCromosoma(b1, a2);
 
-            epochPopulation.Add(a);
-            epochPopulation.Add(b);
+            epochPopulation.Add(child1);
+            epochPopulation.Add(child2);
         }
 
         return epochPopulation;
@@ -83,6 +89,7 @@ public class RNGeneticAlg : MonoBehaviour {
         {
             return (b.puntaje).CompareTo(a.puntaje);
         });
+
 
         List<RNCromosoma> tmp = Elitism();
         for (int i = 0; i < tmp.Count; i++)

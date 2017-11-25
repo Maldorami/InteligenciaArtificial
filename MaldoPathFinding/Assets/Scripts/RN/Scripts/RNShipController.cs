@@ -71,16 +71,18 @@ public class RNShipController : MonoBehaviour
     {
         _rg.isKinematic = true;
         _rg.isKinematic = false;
-
+        _rg.angularVelocity = Vector3.zero;
         _rg.velocity = Vector3.zero;
     }
 
     private void OnEnable()
     {
         isOnCollision = false;
-
-        transform.position = resetPoint.position;
-        transform.rotation = resetPoint.rotation;
+        
+        float randomPosX = Random.Range(-7f, 7f);
+        float randomPosY = Random.Range(0f, 5f);
+        transform.position = new Vector3(randomPosX, randomPosY, 0);
+        transform.rotation = Quaternion.identity;
 
         airTime = 0;
         impactVelocity = 50f;
@@ -123,11 +125,19 @@ public class RNShipController : MonoBehaviour
 
     public void SteerLeft(float modif)
     {
-        transform.Rotate(new Vector3(0.0f, 0.0f, steerSpeed * modif * Time.deltaTime));
+        Vector3 angVel = _rg.angularVelocity;
+
+        angVel.z -= modif * Time.fixedDeltaTime;
+        _rg.angularVelocity = angVel;
+        //transform.Rotate(new Vector3(0.0f, 0.0f, steerSpeed * modif * Time.deltaTime));
     }
     public void SteerRight(float modif)
     {
-        transform.Rotate(new Vector3(0.0f, 0.0f, -steerSpeed * modif * Time.deltaTime));
+        Vector3 angVel = _rg.angularVelocity;
+
+        angVel.z += modif * Time.fixedDeltaTime;
+        _rg.angularVelocity = angVel;
+        //transform.Rotate(new Vector3(0.0f, 0.0f, -steerSpeed * modif * Time.deltaTime));
     }
 
 
@@ -139,18 +149,19 @@ public class RNShipController : MonoBehaviour
 
         if (impactVelocity < 1) impactVelocity = 1;
 
-        puntaje = distModif / distFit + impactToFinishModif / impactVelocity + airTime * airTimeModif;
+        puntaje += distModif / distFit + impactToFinishModif / impactVelocity + airTime * airTimeModif;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag != "Start") isOnCollision = true;
-        
-        if(impactVelocity == 0)
-            impactVelocity = collision.relativeVelocity.magnitude;
+        if (collision.gameObject.tag != "Start") isOnCollision = true;        
+        impactVelocity = collision.relativeVelocity.magnitude;
 
-        if (collision.gameObject.tag == "Finish" && impactVelocity - objectiveReward > 1)
-            impactVelocity -= objectiveReward;
-
+		if (collision.gameObject.tag == "Finish"){
+			if(objectiveReward - collision.relativeVelocity.magnitude > 0)
+            {
+                puntaje += objectiveReward;
+            }
+		}
     }
 }
